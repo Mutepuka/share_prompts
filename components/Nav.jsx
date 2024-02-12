@@ -6,16 +6,18 @@ import Image from 'next/image';
 import{signIn, signOut, useSession, getProviders} from 'next-auth/react'
 
 const Nav = () => {
-  const userLoggedIn = true;
+  const { data: session }= useSession();
   const [providers, setProviders] = useState(null);
+  const [toggleDropdown, settoggleDropdown] = useState(false)
 
-  useEffect(()=>{
-    const setProviders = async ()=>{
-      const response = await getProviders()
-      setProviders(response)
-    }
-    setProviders();
-  },[])
+  useEffect(() => {
+    (async () => {
+      const res = await getProviders();
+      setProviders(res);
+    })();
+  }, [])
+
+  console.log('this is the session', session);
 
  
   return (
@@ -27,11 +29,12 @@ const Nav = () => {
         height={30}
         className='object-contain'
         />
-        <p className='logo_text'>Promptopia Logo</p>
+        <p className='logo_text'>Promptopia</p>
       </Link>
-      {/** desktop navigation */}
+      
+      {/* desktop navigation */}
       <div className='sm:flex hidden'>
-        {userLoggedIn ? (
+        {session?.user ? (
           <div className='flex gap-3 md:gap-5'>
             <Link href="/create-post" className='black_btn'>
             Create Post
@@ -41,7 +44,7 @@ const Nav = () => {
             </button>
             <Link href="/profile">
             <Image
-            src="/assets/images/logo.svg"
+            src={session?.user.image}
             alt='Profile Image'
             width={37}
             height={37}
@@ -67,7 +70,7 @@ const Nav = () => {
       </div>
       {/**Mobile Novigation */}
       <div className='sm:hidden flex-relative'>
-        {userLoggedIn ?(
+        {session?.user ?(
           <div className='flex'>
             <Image
             src="/assets/images/logo.svg"
@@ -75,7 +78,27 @@ const Nav = () => {
             width={37}
             height={37}
             className='rounded-full'
+            onClick ={()=> settoggleDropdown((prev)=> !prev)}
             />
+            {toggleDropdown && (
+              <div className='dropdown' >
+                <Link href='/profile'  className='dropdown_link' onClick={()=> settoggleDropdown(false)}>
+                  My Profile
+                </Link>
+                <Link href='/create-prompt'  className='dropdown_link' onClick={()=> settoggleDropdown(false)}>
+                  Create Prompt
+                </Link>
+                <button type='button' onClick={()=>{
+                  settoggleDropdown(false)
+                  signOut()
+                }}
+                className='mt-5 w-full black_btn'
+                >
+                  Sign Out
+                </button>
+
+              </div>
+            )}
           </div>
         ):(
         <>
