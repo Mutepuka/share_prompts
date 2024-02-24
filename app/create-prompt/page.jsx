@@ -13,6 +13,9 @@ const CreatePrompt = () => {
   const [submitting, setIsSubmitting] = useState(false);
   const [post, setPost] = useState({ prompt: "", tag: "" });
 
+  console.log('create-prompt page', session?.user.id)
+
+
   const createPrompt = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
